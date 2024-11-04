@@ -27,7 +27,7 @@ body {
     .tab-content {
       display: none;
       border: 2px solid #4CAF50; /* Adjust color as needed */
-      padding: 20px;
+      padding: 5px;
       margin: 0 auto;
       max-width: 80%;
       background-color: #fff;
@@ -38,6 +38,7 @@ body {
     .tab-content.active {
       display: block;
     }
+
 #controls {
   margin: 10px auto;
   display: flex;
@@ -53,13 +54,14 @@ body {
   margin: 2px;
 }
 
-/*
+
 #sudoku-grid {
   display: inline-block;
   margin-top: 5px;
   align-items: center;
 }
-*/
+
+/*
 #sudoku-grid {
       display: grid;
       grid-template-columns: repeat(9, 1fr); /* Creates a 9-column grid */
@@ -67,6 +69,8 @@ body {
       max-width: 400px; /* Adjust width as needed */
       margin: 0 auto;
     }
+*/
+
 .sudoku-row {
   display: flex;
 }
