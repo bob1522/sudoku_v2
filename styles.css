@@ -33,6 +33,7 @@ body {
       background-color: #fff;
       text-align: left;
       border-radius: 8px;
+      width: fit-content; /* Ensures container fits content width */
     }
     .tab-content.active {
       display: block;
