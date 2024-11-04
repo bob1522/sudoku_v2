@@ -30,7 +30,7 @@ body {
       padding: 20px;
       margin: 0 auto;
       max-width: 80%;
-      background-color: #fff
+      background-color: #fff;
       text-align: left;
       border-radius: 8px;
       width: fit-content; /* Ensures container fits content width */
