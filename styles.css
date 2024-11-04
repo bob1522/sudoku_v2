@@ -27,7 +27,7 @@ body {
     .tab-content {
       display: none;
       border: 2px solid #4CAF50; /* Adjust color as needed */
-      padding: 5px;
+      padding: 20px;
       margin: 0 auto;
       max-width: 80%;
       background-color: #fff;
