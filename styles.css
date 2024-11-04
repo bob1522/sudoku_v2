@@ -6,7 +6,27 @@ body {
   padding: 0;
   background-color:lightblue;
 }
-
+/* Basic styling for tabs */
+    .tab-container {
+      display: flex;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    .tab {
+      padding: 10px 20px;
+      border: 1px solid #ccc;
+      background-color: #f1f1f1;
+    }
+    .tab.active {
+      background-color: #ddd;
+      font-weight: bold;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
 #controls {
   margin: 10px auto;
   display: flex;
