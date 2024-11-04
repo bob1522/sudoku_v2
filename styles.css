@@ -55,6 +55,7 @@ body {
 #sudoku-grid {
   display: inline-block;
   margin-top: 5px;
+  align-items: center;
 }
 
 .sudoku-row {
