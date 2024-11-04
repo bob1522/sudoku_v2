@@ -81,6 +81,12 @@
       document.getElementById(tabId).classList.add('active');
       document.querySelector('.tab-container .tab[onclick="showTab(\'' + tabId + '\')"]').classList.add('active');
     }
+   // Open the Instructions tab by default on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      showTab('instructions');
+    }); 
+  
+  
   </script>
 </body>
 </html>
