@@ -2,6 +2,7 @@
 
 let sudokuCells; // Define globally
 let selectedCell = null;
+let solutionGrid = [];
 let undoStack = [];
 
 // Wait for the DOM to load
@@ -100,6 +101,7 @@ function selectCell(cell) {
   selectedCell = cell;
   selectedCell.classList.add('selected');
 }
+//------------------------------------------------------------------------------
 // Assuming you have a function to handle cell clicks and number inputs
 function handleNumberInput(number) {
   if (!selectedCell) return;
@@ -129,6 +131,7 @@ function isPuzzleComplete() {
   }
   return true; // All cells are filled
 }
+//-------------------------------------------------------------------------------
 
 // Function to validate the user's solution
 function validateSolution() {
@@ -155,7 +158,7 @@ function validateSolution() {
     alert('Some entries are incorrect. Incorrect numbers are highlighted in red.');
   }
 }
-
+//--------------------------------------------------------------------------------------------
 // Function to add moves to the undo stack
 function addToUndoStack(cell, newValue, enteredViaNumberBar = false) {
   const previousValue = cell.value;
