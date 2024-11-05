@@ -99,6 +99,61 @@ function selectCell(cell) {
   selectedCell = cell;
   selectedCell.classList.add('selected');
 }
+// Assuming you have a function to handle cell clicks and number inputs
+function handleNumberInput(number) {
+  if (!selectedCell) return;
+  
+  // Update the cell's displayed number
+  selectedCell.textContent = number;
+  
+  // Remove any previous styling
+  selectedCell.classList.remove('user-input', 'correct', 'incorrect');
+  
+  // Mark the cell as filled by the user
+  selectedCell.classList.add('user-input');
+  
+  // Check if the puzzle is complete
+  if (isPuzzleComplete()) {
+    validateSolution();
+  }
+}
+
+// Function to check if all cells are filled
+function isPuzzleComplete() {
+  const cells = document.querySelectorAll('.sudoku-cell');
+  for (let cell of cells) {
+    if (cell.textContent === '') {
+      return false; // Found an empty cell
+    }
+  }
+  return true; // All cells are filled
+}
+
+// Function to validate the user's solution
+function validateSolution() {
+  const cells = document.querySelectorAll('.sudoku-cell');
+  let allCorrect = true;
+  
+  cells.forEach((cell, index) => {
+    const row = Math.floor(index / 9);
+    const col = index % 9;
+    const userValue = parseInt(cell.textContent);
+    const correctValue = solutionGrid[row][col]; // Assuming you have a solution grid
+    
+    if (userValue === correctValue) {
+      cell.classList.add('correct');
+    } else {
+      cell.classList.add('incorrect');
+      allCorrect = false;
+    }
+  });
+  
+  if (allCorrect) {
+    alert('Congratulations! You have completed the puzzle correctly!');
+  } else {
+    alert('Some entries are incorrect. Incorrect numbers are highlighted in red.');
+  }
+}
 
 // Function to add moves to the undo stack
 function addToUndoStack(cell, newValue, enteredViaNumberBar = false) {
