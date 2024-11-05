@@ -94,6 +94,7 @@ function addCellEventListeners() {
 // Function to handle cell selection
 function selectCell(cell) {
   if (selectedCell) {
+    alert("cell selected")
     selectedCell.classList.remove('selected');
   }
   selectedCell = cell;
