@@ -6,6 +6,8 @@ body {
   padding: 0;
   background-color:lightblue;
 }
+
+
 /* Basic styling for tabs */
     .tab-container {
       display: flex;
@@ -127,6 +129,26 @@ body {
   margin: 0 5px;
   padding: 5px 5px 5px 5px;
   cursor: pointer;
+}
+
+/* Style for user-entered numbers */
+.user-input {
+  color: blue;
+}
+
+/* Style for correct numbers */
+.correct {
+  color: green;
+}
+
+/* Style for incorrect numbers */
+.incorrect {
+  color: red;
+}
+
+/* Selected cell styling */
+.selected {
+  border: 2px solid #4CAF50; /* Highlight selected cell */
 }
 
 
