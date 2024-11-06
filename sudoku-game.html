@@ -58,6 +58,7 @@
       <button class="number-btn" data-number="9">9</button>
     </div>
 
+    
     <!-- Toolbar -->
     <div id="toolbar">
       <button id="undo-btn">Undo</button>
@@ -66,15 +67,15 @@
       <button id="load-btn">Load Game</button>
       <button id="solve-btn">Solve</button>
       <button id="print-btn">Print</button>
+      <button id="hint-btn">Hint</button>
+      <span id="hints-used">Hints used: 0</span>
     </div>
-  </div>
-
-  
 
   <!-- Include the Sudoku library -->
   <script src="sudoku.js"></script>
   <!-- Include the main script -->
   <script src="sudoku-game.js"></script>
+  
   <!-- JavaScript for Tab Switching -->
   <script>
     function showTab(tabId) {
@@ -87,8 +88,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       showTab('instructions');
     }); 
-  
-  
   </script>
 </body>
 </html>
