@@ -124,6 +124,11 @@ body {
   border: 2px solid #4CAF50; /* Highlight selected cell */
 }
 
+/* Style for hint cells */
+.hint-cell {
+  color: orange; /* Choose a color that differentiates hints */
+}
+
 #number-grid {
   display: flex;
   justify-content: center;
