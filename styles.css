@@ -102,10 +102,34 @@ body {
 }
 
 
-/* Remove red text from pre-filled cells */
-.prefilled-cell.user-input {
+/* Style for prefilled cells */
+.prefilled-cell {
   color: black;
 }
+
+/* Style for user-entered numbers */
+.user-input,
+.number-bar-input {
+  color: blue;
+}
+
+/* Style for correct user entries */
+.sudoku-cell.correct:not(.prefilled-cell) {
+  color: green;
+}
+
+/* Style for incorrect user entries */
+.sudoku-cell.incorrect:not(.prefilled-cell) {
+  color: red;
+}
+
+/* Selected cell styling */
+.selected {
+  border: 2px solid #4CAF50; /* Highlight selected cell */
+}
+
+
+
 #number-grid {
   display: flex;
   justify-content: center;
