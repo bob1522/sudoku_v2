@@ -3,7 +3,8 @@
 let sudokuCells; // Define globally
 let selectedCell = null;
 let undoStack = [];
-let solutionArray = []; // Store the solution grid globally
+let solutionGrid = []; // Store the solution grid
+let hintsUsed = 0; // Keep track of the number of hints used
 
 // Wait for the DOM to load
 document.addEventListener('DOMContentLoaded', function() {
@@ -41,6 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
   // Event listener for 'Solve Game' button
   document.getElementById('solve-btn').addEventListener('click', function() {
     solveGame();
+  });
+
+  // Event listener for 'Hint' button
+  document.getElementById('hint-btn').addEventListener('click', function() {
+    provideHint();
   });
 });
 
@@ -81,22 +87,14 @@ function addCellEventListeners() {
     button.addEventListener('click', () => {
       if (selectedCell && !selectedCell.classList.contains('prefilled-cell')) {
         const number = button.getAttribute('data-number');
-
-        // Remove 'correct' and 'incorrect' classes
-        selectedCell.classList.remove('correct', 'incorrect');
-
         addToUndoStack(selectedCell, number, true); // Indicate number bar input
         selectedCell.value = number;
         // Add the 'number-bar-input' class
         selectedCell.classList.add('number-bar-input');
         // Remove other input-related classes if necessary
-        selectedCell.classList.remove('user-input');
+        selectedCell.classList.remove('user-input', 'hint-cell', 'correct', 'incorrect');
 
-        // Deselect the cell after input
-        selectedCell.classList.remove('selected');
-        selectedCell = null;
-
-        // After entering the number, check if the puzzle is complete
+        // After entering a number, check if the puzzle is complete
         if (isPuzzleComplete()) {
           validateSolution();
         }
@@ -122,7 +120,8 @@ function addToUndoStack(cell, newValue, enteredViaNumberBar = false) {
     cell: cell,
     previousValue: previousValue,
     previousEnteredViaNumberBar: previousEnteredViaNumberBar,
-    enteredViaNumberBar: enteredViaNumberBar
+    enteredViaNumberBar: enteredViaNumberBar,
+    previousClasses: Array.from(cell.classList),
   });
 }
 
@@ -131,20 +130,12 @@ function undoLastMove() {
   if (undoStack.length > 0) {
     const lastMove = undoStack.pop();
     lastMove.cell.value = lastMove.previousValue;
-    // Update classes based on the previous value
-    if (lastMove.previousValue) {
-      if (lastMove.previousEnteredViaNumberBar) {
-        lastMove.cell.classList.add('number-bar-input');
-        lastMove.cell.classList.remove('user-input');
-      } else {
-        lastMove.cell.classList.add('user-input');
-        lastMove.cell.classList.remove('number-bar-input');
-      }
-    } else {
-      lastMove.cell.classList.remove('number-bar-input');
-      lastMove.cell.classList.remove('user-input');
-    }
-    // Remove 'correct' and 'incorrect' classes
+    // Restore previous classes
+    lastMove.cell.className = ''; // Clear all classes
+    lastMove.previousClasses.forEach((className) => {
+      lastMove.cell.classList.add(className);
+    });
+    // Remove validation classes if any
     lastMove.cell.classList.remove('correct', 'incorrect');
   }
 }
@@ -152,20 +143,17 @@ function undoLastMove() {
 // Function to generate a new game
 function generateNewGame(difficulty) {
   clearBoard();
+  hintsUsed = 0; // Reset hints used
+  document.getElementById('hints-used').textContent = 'Hints used: ' + hintsUsed;
+
   // Generate a new puzzle using the sudoku library
   const puzzleString = sudoku.generate(difficulty);
   const puzzleArray = convertPuzzleStringToArray(puzzleString);
-  
-  // Store the solution
-  const solutionString = sudoku.solve(puzzleString);
-  if (solutionString) {
-    solutionArray = convertPuzzleStringToArray(solutionString);
-  } else {
-    alert('No solution found for the generated puzzle.');
-    return;
-  }
-
   populateBoard(puzzleArray);
+
+  // Get the solution and store it
+  const solutionString = sudoku.solve(puzzleString);
+  solutionGrid = convertPuzzleStringToArray(solutionString);
 }
 
 // Function to solve the game
@@ -173,8 +161,10 @@ function solveGame() {
   const boardString = getPuzzleState();
   const solutionString = sudoku.solve(boardString);
   if (solutionString) {
-    solutionArray = convertPuzzleStringToArray(solutionString);
+    const solutionArray = convertPuzzleStringToArray(solutionString);
     populateBoard(solutionArray, true); // Pass true to indicate solving
+    // Update the solutionGrid
+    solutionGrid = solutionArray;
   } else {
     alert('No solution found for the current board.');
   }
@@ -184,11 +174,10 @@ function solveGame() {
 function clearBoard() {
   sudokuCells.forEach((cell) => {
     cell.value = '';
-    cell.classList.remove('prefilled-cell', 'user-input', 'number-bar-input', 'correct', 'incorrect');
+    cell.classList.remove('prefilled-cell', 'user-input', 'number-bar-input', 'correct', 'incorrect', 'hint-cell');
     // Ensure cells remain read-only
     cell.readOnly = true;
   });
-  undoStack = [];
 }
 
 // Function to populate the board with a puzzle or solution
@@ -201,27 +190,27 @@ function populateBoard(puzzleArray, isSolving = false) {
       if (!isSolving) {
         // Cells that are part of the initial puzzle
         cell.classList.add('prefilled-cell');
-        cell.classList.remove('user-input', 'number-bar-input');
+        cell.classList.remove('user-input', 'number-bar-input', 'hint-cell');
       } else {
         // If solving, don't disable cells, just populate
         if (!cell.classList.contains('prefilled-cell')) {
           cell.classList.add('user-input');
-          cell.classList.remove('number-bar-input');
+          cell.classList.remove('number-bar-input', 'hint-cell');
         }
       }
     } else {
       if (!isSolving) {
         cell.value = '';
-        cell.classList.remove('prefilled-cell', 'user-input', 'number-bar-input');
+        cell.classList.remove('prefilled-cell', 'user-input', 'number-bar-input', 'hint-cell');
       }
     }
-    // Remove 'correct' and 'incorrect' classes
+    // Remove validation classes
     cell.classList.remove('correct', 'incorrect');
     index++;
   });
 }
 
-// Function to get the current state of the puzzle as a string
+// Function to get the current state of the puzzle
 function getPuzzleState() {
   let puzzle = '';
   sudokuCells.forEach((cell) => {
@@ -255,8 +244,11 @@ function loadPuzzle() {
 }
 
 function loadPuzzleState(puzzleState) {
+  hintsUsed = puzzleState.hintsUsed || 0;
+  solutionGrid = puzzleState.solutionGrid || [];
+  document.getElementById('hints-used').textContent = 'Hints used: ' + hintsUsed;
   sudokuCells.forEach((cell, index) => {
-    const cellData = puzzleState[index];
+    const cellData = puzzleState.cells[index];
     cell.value = cellData.value;
     cell.className = ''; // Reset classes
     cellData.classes.forEach((className) => {
@@ -268,16 +260,17 @@ function loadPuzzleState(puzzleState) {
 }
 
 function getCurrentPuzzleState() {
-  let puzzleState = [];
+  let puzzleState = {
+    cells: [],
+    hintsUsed: hintsUsed,
+    solutionGrid: solutionGrid
+  };
   sudokuCells.forEach((cell) => {
-    // Exclude 'correct' and 'incorrect' classes when saving
-    const classesToSave = Array.from(cell.classList).filter(className => className !== 'correct' && className !== 'incorrect');
     const cellData = {
       value: cell.value || '',
-      isPrefilled: cell.classList.contains('prefilled-cell'),
-      classes: classesToSave,
+      classes: Array.from(cell.classList),
     };
-    puzzleState.push(cellData);
+    puzzleState.cells.push(cellData);
   });
   return puzzleState;
 }
@@ -287,45 +280,80 @@ function resetGame() {
   sudokuCells.forEach((cell) => {
     if (!cell.classList.contains('prefilled-cell')) {
       cell.value = '';
-      cell.classList.remove('user-input', 'number-bar-input', 'correct', 'incorrect');
+      cell.classList.remove('user-input', 'number-bar-input', 'correct', 'incorrect', 'hint-cell');
     }
   });
   undoStack = [];
+  hintsUsed = 0; // Reset hints used
+  document.getElementById('hints-used').textContent = 'Hints used: ' + hintsUsed;
   localStorage.removeItem('savedPuzzle');
 }
 
-// Function to check if all cells are filled
+// Function to check if the puzzle is complete
 function isPuzzleComplete() {
-  let complete = true;
-  sudokuCells.forEach(cell => {
+  for (let cell of sudokuCells) {
     if (cell.value === '') {
-      complete = false;
+      return false;
     }
-  });
-  return complete;
+  }
+  return true;
 }
 
 // Function to validate the user's solution
 function validateSolution() {
   let allCorrect = true;
+
   sudokuCells.forEach((cell, index) => {
+    if (cell.classList.contains('prefilled-cell')) {
+      // Skip prefilled cells
+      return;
+    }
     const userValue = parseInt(cell.value);
-    const correctValue = solutionArray[index];
+    const correctValue = solutionGrid[index];
+
+    // Remove any previous 'correct' or 'incorrect' classes
+    cell.classList.remove('correct', 'incorrect');
 
     if (userValue === correctValue) {
-      // Correct value
       cell.classList.add('correct');
-      cell.classList.remove('incorrect');
     } else {
-      // Incorrect value
       cell.classList.add('incorrect');
-      cell.classList.remove('correct');
       allCorrect = false;
     }
   });
+
   if (allCorrect) {
-    alert('Congratulations! You have completed the puzzle correctly!');
+    alert('Congratulations! You have completed the puzzle correctly!\nHints used: ' + hintsUsed);
   } else {
     alert('Some entries are incorrect. Incorrect numbers are highlighted in red.');
+  }
+}
+
+// Function to provide a hint
+function provideHint() {
+  if (selectedCell && !selectedCell.classList.contains('prefilled-cell') && selectedCell.value === '') {
+    const cellIndex = Array.from(sudokuCells).indexOf(selectedCell);
+    const correctValue = solutionGrid[cellIndex];
+    if (correctValue) {
+      // Add to undo stack
+      addToUndoStack(selectedCell, selectedCell.value);
+      // Set the cell's value to the correct value
+      selectedCell.value = correctValue;
+      // Mark the cell as a hint cell
+      selectedCell.classList.add('hint-cell');
+      // Remove other input-related classes if necessary
+      selectedCell.classList.remove('user-input', 'number-bar-input', 'incorrect', 'correct');
+      // Increment hintsUsed
+      hintsUsed++;
+      // Update hints used display
+      document.getElementById('hints-used').textContent = 'Hints used: ' + hintsUsed;
+
+      // After providing a hint, check if the puzzle is complete
+      if (isPuzzleComplete()) {
+        validateSolution();
+      }
+    }
+  } else {
+    alert('Please select an empty cell to get a hint.');
   }
 }
