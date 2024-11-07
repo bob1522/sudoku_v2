@@ -147,7 +147,7 @@ function generateNewGame(difficulty) {
   document.getElementById('hints-used').textContent = 'Hints used: ' + hintsUsed;
 
   // Generate a new puzzle using the sudoku library
-  const puzzleString = sudoku.generate(difficulty);
+  const puzzleString = generate_puzzle.generateNewPuzzle(difficulty);
   const puzzleArray = convertPuzzleStringToArray(puzzleString);
   populateBoard(puzzleArray);
 
